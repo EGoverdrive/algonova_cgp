@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Digital Clock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@300&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Bitcount Prop Single", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #e76012, #144273);
+      background-size: 400% 400%;
+      animation: gradientFlow 15s ease infinite;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      transition: background 1s ease;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .stars {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: blink 2s infinite ease-in-out;
+      opacity: 0.7;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+
+    .clock {
+      display: flex;
+      align-items: center;
+      gap: 1.5em;
+      z-index: 1;
+    }
+
+    .clock-box {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-size: 5em;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    .clock-box span {
+      transform: translateX(5%);
+      display: inline-block;
+    }
+
+    .colon {
+      font-size: 4.5em;
+      color: white;
+      z-index: 1;
+    }
+
+    #ampm {
+      font-size: 1.7em;
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      align-self: flex-end;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+      z-index: 1;
+    }
+
+    #date {
+      margin-top: 2em;
+      font-size: 1.4em;
+      color: white;
+      letter-spacing: 0.05em;
+      z-index: 1;
+    }
+
+    button {
+      margin-top: 1.5em;
+      padding: 1em 2em;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 0.5em;
+      cursor: pointer;
+      background-color: white;
+      color: #333;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    button:hover {
+      background-color: #ddd;
+    }
+
+    .dark-mode {
+      background: #111;
+    }
+
+    .dark-mode .clock-box {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .dark-mode .colon,
+    .dark-mode #date {
+      color: white;
+    }
+
+    .dark-mode button {
+      background-color: #444;
+      color: #fff;
+    }
+
+    .dark-mode button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stars" id="stars"></div>
+
+  <div class="clock">
+    <div class="clock-box" id="hour"><span>--</span></div>
+    <div class="colon">:</div>
+    <div class="clock-box" id="minute"><span>--</span></div>
+    <div class="colon">:</div>
+    <div class="clock-box" id="seconds"><span>--</span></div>
+    <div id="ampm">--</div>
+  </div>
+
+  <div id="date">Loading date...</div>
+  <button onclick="toggleMode()">Toggle Dark/Light Mode</button>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours();
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+
+      document.getElementById("hour").innerHTML = `<span>${h.toString().padStart(2, "0")}</span>`;
+      document.getElementById("minute").innerHTML = `<span>${m.toString().padStart(2, "0")}</span>`;
+      document.getElementById("seconds").innerHTML = `<span>${s.toString().padStart(2, "0")}</span>`;
+      document.getElementById("ampm").textContent = ampm;
+
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("date").textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    function toggleMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      starsContainer.appendChild(star);
+    }
+  </script>
+
+</body>
+</html>
